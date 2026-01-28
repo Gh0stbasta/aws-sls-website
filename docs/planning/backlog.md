@@ -7,7 +7,7 @@ Tickets in dieser Priority müssen sequenziell abgearbeitet werden - sie bilden 
 | Ticket | Title                                | Effort | Status  | Est. Days |
 | ------ | ------------------------------------ | ------ | ------- | --------- |
 | 001    | Project Setup & Monorepo             | S      | ✅ DONE | 1         |
-| 002    | CDK Infrastructure (S3 + CloudFront) | M      | OPEN    | 2-3       |
+| 002    | CDK Infrastructure (S3 + CloudFront) | M      | ✅ DONE | 2-3       |
 | 003    | Frontend Setup (Vite + React + TS)   | S      | ✅ DONE | 1         |
 | 013    | GitHub Actions CI/CD Pipeline        | M      | OPEN    | 1-2       |
 
