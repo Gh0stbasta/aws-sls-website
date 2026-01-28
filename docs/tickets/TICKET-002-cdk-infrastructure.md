@@ -20,6 +20,7 @@
 ## Contract Definition
 
 **CDK Stack Exports:**
+
 ```typescript
 // lib/website-stack.ts
 export interface WebsiteStackProps extends cdk.StackProps {
@@ -36,13 +37,14 @@ export class WebsiteStack extends cdk.Stack {
 
 // lib/index.ts (App)
 const app = new cdk.App();
-new WebsiteStack(app, 'WebsiteStack', {
-  bucketName: 'aws-sls-website-prod',
-  env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION }
+new WebsiteStack(app, "WebsiteStack", {
+  bucketName: "aws-sls-website-prod",
+  env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION },
 });
 ```
 
 **Deployment Output:**
+
 - S3 Bucket (Private + OAI)
 - CloudFront Distribution
 - IAM Policy für GitHub Actions (bereits vorhanden, nur referenzieren)
@@ -61,6 +63,7 @@ new WebsiteStack(app, 'WebsiteStack', {
 ## Requirements
 
 ### Funktional
+
 - [ ] S3 Bucket mit correct name/versioning
 - [ ] CloudFront Distribution mit Default Root Object (index.html)
 - [ ] OAI für S3 Access only via CloudFront
@@ -69,6 +72,7 @@ new WebsiteStack(app, 'WebsiteStack', {
 - [ ] Alle Acceptance Criteria erfüllt
 
 ### Technisch
+
 - [ ] CDK v2 (nicht v1)
 - [ ] TypeScript Interfaces definiert
 - [ ] No hardcoded values (use env vars/config)
@@ -77,6 +81,7 @@ new WebsiteStack(app, 'WebsiteStack', {
 - [ ] Kein Code über 500 Zeilen
 
 ### Dokumentation
+
 - [ ] `packages/infrastructure/README.md`: How to deploy
 - [ ] `cdk.json` erklärt
 - [ ] Inline Comments für non-obvious CDK Decisions
@@ -85,28 +90,33 @@ new WebsiteStack(app, 'WebsiteStack', {
 ## Implementation Plan
 
 **Schritt 1: CDK App Setup**
+
 - [ ] `packages/infrastructure` als CDK App initialisieren
 - [ ] `cdk.json` mit Context Variables
 - [ ] `lib/website-stack.ts` Grundgerüst
 
 **Schritt 2: S3 Bucket**
+
 - [ ] S3 Bucket erstellen (Private, no public access)
 - [ ] Versioning disabled
 - [ ] BlockPublicAccess enabled
 - [ ] Export bucket reference
 
 **Schritt 3: CloudFront + OAI**
+
 - [ ] OAI erstellen
 - [ ] CloudFront Distribution mit S3 Origin
 - [ ] Error Page Handling (404 → index.html)
 - [ ] Cache Behavior (Default TTL 24h)
 
 **Schritt 4: IAM Policy**
+
 - [ ] IAM Policy für GitHub Actions referenzieren
 - [ ] S3 PutObject, DeleteObject, ListBucket
 - [ ] CloudFront CreateInvalidation
 
 **Schritt 5: Testing**
+
 - [ ] `cdk synth` generiert valid CloudFormation
 - [ ] `cdk diff` zeigt Änderungen
 - [ ] `cdk deploy` mit OIDC (Test mit real Credentials)
@@ -114,9 +124,11 @@ new WebsiteStack(app, 'WebsiteStack', {
 ## Dependencies
 
 **Blockiert durch:**
+
 - [ ] TICKET-001 (Project Setup)
 
 **Blockiert:**
+
 - [ ] TICKET-003 (Frontend Setup - braucht Bucket Name)
 - [ ] TICKET-013 (CI/CD Pipeline - braucht Stack)
 

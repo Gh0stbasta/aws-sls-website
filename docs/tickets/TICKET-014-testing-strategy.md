@@ -20,6 +20,7 @@
 ## Contract Definition
 
 **Testing Layers:**
+
 ```
 ├── Unit Tests        # Einzelne Funktionen/Komponenten
 ├── Integration Tests # Zusammenspiel von Modulen
@@ -28,6 +29,7 @@
 ```
 
 **Test Commands:**
+
 ```bash
 # Root-level
 pnpm test              # Run all tests
@@ -55,19 +57,18 @@ cd packages/infrastructure && pnpm test
 ## Requirements
 
 ### Funktional
+
 - [ ] **Frontend Testing:**
   - [ ] Vitest + React Testing Library
   - [ ] Component Unit Tests
   - [ ] Hook Testing Support
   - [ ] Mock Setup (API, Context, etc.)
   - [ ] Coverage Reports (HTML + Terminal)
-  
 - [ ] **Infrastructure Testing:**
   - [ ] CDK Snapshot Tests
   - [ ] Fine-grained Assertions (S3, CloudFront)
   - [ ] Stack Property Validation
   - [ ] IAM Policy Tests
-  
 - [ ] **Monorepo Integration:**
   - [ ] Root-level aggregate test command
   - [ ] Parallel test execution
@@ -75,6 +76,7 @@ cd packages/infrastructure && pnpm test
   - [ ] Shared test utilities (optional)
 
 ### Technisch
+
 - [ ] Vitest für Frontend (schneller als Jest, native ESM)
 - [ ] Jest für Infrastructure (CDK-kompatibel)
 - [ ] TypeScript Support in allen Tests
@@ -83,6 +85,7 @@ cd packages/infrastructure && pnpm test
 - [ ] CI-friendly output (TAP/JUnit XML)
 
 ### Dokumentation
+
 - [ ] Root README: Testing Section
 - [ ] `packages/frontend/README.md`: Testing Guide
 - [ ] `packages/infrastructure/README.md`: Testing Guide
@@ -92,28 +95,33 @@ cd packages/infrastructure && pnpm test
 ## Implementation Plan
 
 ### Schritt 1: Frontend Testing Setup
+
 - [ ] `pnpm add -D vitest @testing-library/react @testing-library/jest-dom`
 - [ ] `vitest.config.ts` erstellen
 - [ ] `src/tests/setup.ts` für Test Environment
 - [ ] Example Test: `App.test.tsx`
 
 ### Schritt 2: Infrastructure Testing Setup
+
 - [ ] `pnpm add -D jest @types/jest ts-jest`
 - [ ] `jest.config.js` erstellen
 - [ ] Example Test: `website-stack.test.ts`
 - [ ] CDK Snapshot Tests
 
 ### Schritt 3: Test Utilities
+
 - [ ] Frontend: Custom render function mit Providers
 - [ ] Frontend: Mock handlers (MSW optional)
 - [ ] Infrastructure: Helper für Stack instantiation
 
 ### Schritt 4: Root-level Integration
+
 - [ ] `package.json` scripts: `test`, `test:frontend`, `test:infra`
 - [ ] Coverage aggregation (optional)
 - [ ] Pre-commit hooks (optional, via Husky)
 
 ### Schritt 5: Documentation
+
 - [ ] Testing best practices dokumentieren
 - [ ] Example Tests kommentieren
 - [ ] CI-Integration vorbereiten
@@ -121,11 +129,13 @@ cd packages/infrastructure && pnpm test
 ## Dependencies
 
 **Blockiert durch:**
+
 - [ ] TICKET-001 (Project Setup)
 - [ ] TICKET-003 (Frontend Setup)
 - [ ] TICKET-002 (Infrastructure Setup)
 
 **Blockiert:**
+
 - [ ] TICKET-013 (CI/CD - braucht Tests)
 - [ ] Alle Feature Tickets (sollten Tests schreiben)
 
@@ -134,16 +144,19 @@ cd packages/infrastructure && pnpm test
 ### Frontend Testing Scope
 
 **Unit Tests:**
+
 - React Components (render, props, events)
 - Custom Hooks (state, effects)
 - Utility Functions (helpers, formatters)
 
 **Integration Tests:**
+
 - Component interactions
 - Context Providers
 - Routing (falls vorhanden)
 
 **Not in Scope (Phase 1):**
+
 - E2E Tests (Playwright/Cypress)
 - Visual Regression Tests
 - Performance Tests
@@ -151,31 +164,35 @@ cd packages/infrastructure && pnpm test
 ### Infrastructure Testing Scope
 
 **CDK Snapshot Tests:**
+
 - Entire stack CloudFormation template
 - Detect unintended changes
 
 **Fine-grained Assertions:**
+
 - S3 Bucket properties (encryption, versioning)
 - CloudFront distribution settings
 - IAM policies correctness
 - Resource count validation
 
 **Not in Scope:**
+
 - Live AWS deployment tests
 - Integration with real AWS services
 
 ### Coverage Goals
 
-| Component      | Target Coverage | Priority |
-| -------------- | --------------- | -------- |
-| Frontend Utils | 90%+            | High     |
-| React Hooks    | 80%+            | High     |
-| React Components | 70%+          | Medium   |
-| CDK Stacks     | 80%+            | High     |
+| Component        | Target Coverage | Priority |
+| ---------------- | --------------- | -------- |
+| Frontend Utils   | 90%+            | High     |
+| React Hooks      | 80%+            | High     |
+| React Components | 70%+            | Medium   |
+| CDK Stacks       | 80%+            | High     |
 
 ## Example Tests
 
 ### Frontend Example
+
 ```typescript
 // packages/frontend/src/App.test.tsx
 import { describe, it, expect } from 'vitest';
@@ -191,22 +208,23 @@ describe('App', () => {
 ```
 
 ### Infrastructure Example
+
 ```typescript
 // packages/infrastructure/lib/website-stack.test.ts
-import { App } from 'aws-cdk-lib';
-import { Template } from 'aws-cdk-lib/assertions';
-import { WebsiteStack } from './website-stack';
+import { App } from "aws-cdk-lib";
+import { Template } from "aws-cdk-lib/assertions";
+import { WebsiteStack } from "./website-stack";
 
-describe('WebsiteStack', () => {
+describe("WebsiteStack", () => {
   const app = new App();
-  const stack = new WebsiteStack(app, 'TestStack', {
-    bucketName: 'test-bucket',
+  const stack = new WebsiteStack(app, "TestStack", {
+    bucketName: "test-bucket",
   });
   const template = Template.fromStack(stack);
 
-  it('creates S3 bucket with correct properties', () => {
-    template.hasResourceProperties('AWS::S3::Bucket', {
-      BucketName: 'test-bucket',
+  it("creates S3 bucket with correct properties", () => {
+    template.hasResourceProperties("AWS::S3::Bucket", {
+      BucketName: "test-bucket",
       PublicAccessBlockConfiguration: {
         BlockPublicAcls: true,
         BlockPublicPolicy: true,
@@ -214,8 +232,8 @@ describe('WebsiteStack', () => {
     });
   });
 
-  it('creates CloudFront distribution', () => {
-    template.resourceCountIs('AWS::CloudFront::Distribution', 1);
+  it("creates CloudFront distribution", () => {
+    template.resourceCountIs("AWS::CloudFront::Distribution", 1);
   });
 });
 ```
