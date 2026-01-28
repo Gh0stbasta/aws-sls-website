@@ -31,6 +31,7 @@ Diese Tickets bauen auf P1 auf und sind meistens parallel startbar.
 | 006    | Hero Section                       | M      | OPEN   | 2         |
 | 010    | Quick Start Section                | S      | OPEN   | 1         |
 | 012    | Documentation                      | S      | OPEN   | 1         |
+| 014    | Testing Strategy & Implementation  | M      | OPEN   | 2         |
 
 **Rationale:**
 
@@ -38,6 +39,7 @@ Diese Tickets bauen auf P1 auf und sind meistens parallel startbar.
 - TICKET-005: Layout Components (Header/Footer) werden von vielen Sections benutzt
 - TICKET-006, 010: Key User-Facing Sections
 - TICKET-012: Documentation sollte kontinuierlich aktualisiert werden
+- TICKET-014: Testing Strategy wichtig für Code-Qualität und CI/CD
 
 ---
 
