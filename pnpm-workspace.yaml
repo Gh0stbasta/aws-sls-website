@@ -1,0 +1,7 @@
+packages:
+  - 'packages/*'
+
+allow-workspace-cycles: true
+
+shamefully-hoist: false
+strict-peer-dependencies: false

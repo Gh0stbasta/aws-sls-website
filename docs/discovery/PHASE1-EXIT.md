@@ -29,6 +29,7 @@ Gemäß [workflow/01_discovery.md](../workflow/01_discovery.md) müssen folgende
 - [x] ADR-001: Frontend Technology Stack ✅
 - [x] ADR-002: AWS Infrastructure Architecture ✅
 - [x] ADR-003: CI/CD Pipeline Strategy ✅
+- [x] ADR-004: Security & Deployment Credentials Strategy ✅
 - [x] Alle ADRs vom Architekten genehmigt ✅
 
 ### 4. Technical Constraints & Infrastructure
@@ -71,6 +72,7 @@ Gemäß [workflow/01_discovery.md](../workflow/01_discovery.md) müssen folgende
 | ADR-001 (Frontend Stack) | ✅ | `docs/adrs/ADR-001-frontend-stack.md` |
 | ADR-002 (AWS Infrastructure) | ✅ | `docs/adrs/ADR-002-aws-infrastructure.md` |
 | ADR-003 (CI/CD Pipeline) | ✅ | `docs/adrs/ADR-003-cicd-pipeline.md` |
+| ADR-004 (Security & Deployment) | ✅ | `docs/adrs/ADR-004-security-deployment.md` |
 
 ---
 

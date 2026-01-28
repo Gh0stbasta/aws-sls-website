@@ -1,0 +1,22 @@
+{
+  "app": "app",
+  "context": {},
+  "require": [
+    "@aws-cdk/core"
+  ],
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "**/node_modules",
+      "dist/**"
+    ]
+  },
+  "output": "cloudformation.json",
+  "outputAssets": true
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@workspace/infrastructure",
+  "version": "1.0.0",
+  "description": "Infrastructure - AWS CDK TypeScript",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk",
+    "cdk:synth": "cdk synth",
+    "cdk:deploy": "cdk deploy --require-approval never",
+    "cdk:destroy": "cdk destroy --force",
+    "cdk:watch": "cdk watch"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.120.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

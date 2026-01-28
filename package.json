@@ -1,0 +1,27 @@
+{
+  "name": "aws-sls-website",
+  "version": "1.0.0",
+  "description": "Serverless Static Website Template - AWS + React + Vite",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "install-all": "pnpm install",
+    "dev:frontend": "pnpm --filter @workspace/frontend run dev",
+    "dev:infra": "pnpm --filter @workspace/infrastructure run cdk watch",
+    "build:frontend": "pnpm --filter @workspace/frontend run build",
+    "build:infra": "pnpm --filter @workspace/infrastructure run build",
+    "test": "pnpm --recursive run test",
+    "lint": "pnpm --recursive run lint",
+    "format": "pnpm --recursive run format"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}
