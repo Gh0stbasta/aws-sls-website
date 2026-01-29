@@ -1,0 +1,133 @@
+# =============================================================================
+# GitHub Actions Workflow: Destroy AWS Infrastructure
+# =============================================================================
+# 
+# Purpose: Tear down the complete serverless website infrastructure from AWS
+# 
+# Trigger:
+#   - Manual trigger via workflow_dispatch only (safety measure)
+# 
+# Security:
+#   - Uses AWS OIDC (OpenID Connect) for authentication (no long-lived credentials)
+#   - Requires GitHub Secrets: AWS_ACCOUNT_ID, AWS_DEPLOY_ROLE_ARN, AWS_REGION
+#   - Manual trigger only to prevent accidental destruction
+# 
+# Related ADRs:
+#   - ADR-003: CI/CD Pipeline Strategy
+#   - ADR-004: Security & Deployment Credentials Strategy
+# 
+# =============================================================================
+
+name: Destroy AWS Infrastructure
+
+on:
+  # Manual destruction trigger only (safety measure)
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "DESTROY" to confirm infrastructure destruction'
+        required: true
+        type: string
+
+# OIDC permissions for AWS authentication
+# Required for temporary credential generation via GitHub OIDC provider
+permissions:
+  contents: read      # Read repository contents
+  id-token: write     # Generate OIDC token for AWS authentication
+
+jobs:
+  destroy:
+    name: Destroy Infrastructure
+    runs-on: ubuntu-latest
+    
+    steps:
+      # =========================================================================
+      # Step 1: Validate Confirmation
+      # =========================================================================
+      - name: Validate Confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DESTROY" ]; then
+            echo "Error: Confirmation not provided. You must type 'DESTROY' to confirm."
+            exit 1
+          fi
+          echo "Confirmation validated. Proceeding with infrastructure destruction..."
+      
+      # =========================================================================
+      # Step 2: Checkout Repository
+      # =========================================================================
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # =========================================================================
+      # Step 3: Install pnpm Package Manager
+      # =========================================================================
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      
+      # =========================================================================
+      # Step 4: Setup Node.js Environment
+      # =========================================================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      # =========================================================================
+      # Step 5: Install Dependencies
+      # =========================================================================
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # =========================================================================
+      # Step 6: Configure AWS Credentials (OIDC)
+      # =========================================================================
+      # Uses OpenID Connect to obtain temporary AWS credentials
+      # No long-lived access keys stored in repository
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      # =========================================================================
+      # Step 7: Check Stack Existence
+      # =========================================================================
+      # Verify that the stack exists before attempting to destroy
+      - name: Check Stack Existence
+        id: check-stack
+        run: |
+          STACK_NAME="WebsiteStack"
+          
+          # Check if stack exists
+          if ! aws cloudformation describe-stacks --stack-name $STACK_NAME &> /dev/null; then
+            echo "Stack $STACK_NAME does not exist. Nothing to destroy."
+            echo "stack-exists=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "Stack $STACK_NAME exists. Proceeding with destruction..."
+          echo "stack-exists=true" >> $GITHUB_OUTPUT
+      
+      # =========================================================================
+      # Step 8: Destroy CDK Stack
+      # =========================================================================
+      # Destroys all infrastructure (S3, CloudFront, etc.)
+      # CDK automatically empties S3 bucket via autoDeleteObjects custom resource
+      # Uses --force flag to skip confirmation prompts
+      - name: Destroy CDK Stack
+        if: steps.check-stack.outputs.stack-exists == 'true'
+        run: cd packages/infrastructure && pnpm run cdk:destroy
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      
+      # =========================================================================
+      # Step 9: Confirm Destruction
+      # =========================================================================
+      - name: Confirm Destruction
+        if: steps.check-stack.outputs.stack-exists == 'true'
+        run: |
+          echo "✅ Infrastructure successfully destroyed"
+          echo "All AWS resources have been removed"
