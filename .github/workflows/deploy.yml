@@ -99,14 +99,27 @@ jobs:
       - name: Get Stack Outputs
         id: stack-outputs
         run: |
+          STACK_NAME="WebsiteStack"
+          
           BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name WebsiteStack \
+            --stack-name $STACK_NAME \
             --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' \
             --output text)
           DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
-            --stack-name WebsiteStack \
+            --stack-name $STACK_NAME \
             --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' \
             --output text)
+          
+          # Validate outputs are not empty
+          if [ -z "$BUCKET_NAME" ]; then
+            echo "Error: BucketName output not found in stack $STACK_NAME"
+            exit 1
+          fi
+          if [ -z "$DISTRIBUTION_ID" ]; then
+            echo "Error: DistributionId output not found in stack $STACK_NAME"
+            exit 1
+          fi
+          
           echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
           echo "distribution-id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
       

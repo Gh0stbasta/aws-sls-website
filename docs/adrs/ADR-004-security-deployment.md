@@ -163,7 +163,7 @@ Nicht enthalten: EC2, RDS, IAM, Secrets Manager, etc.
   - [x] `AWS_REGION` - Deployment Region
   - [x] `AWS_DEPLOY_ROLE_ARN` - Full ARN der Deployment Role
 
-- [ ] **Workflow File (.github/workflows/deploy.yml):**
+- [x] **Workflow File (.github/workflows/deploy.yml):**
   - [x] `permissions: id-token: write` für OIDC
   - [x] `aws-actions/configure-aws-credentials` mit OIDC Mode
   - [x] Output Redirection für sensible Operationen (`> /dev/null`)

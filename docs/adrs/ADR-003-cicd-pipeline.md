@@ -107,22 +107,22 @@ Trigger: Push to main
 
 **Key Steps:**
 
-1. **AWS Credentials Setup:**
+1. **AWS Credentials Setup (OIDC):**
    ```yaml
    - uses: aws-actions/configure-aws-credentials@v4
      with:
-       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-       aws-region: us-east-1
+       role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+       aws-region: ${{ secrets.AWS_REGION }}
    ```
 
 2. **CDK Deployment (only if infrastructure changed):**
    ```yaml
    - name: Deploy CDK
      run: |
-       cd infrastructure
-       npm ci
-       npx cdk deploy --require-approval never
+       cd packages/infrastructure
+       pnpm run cdk:deploy
+     env:
+       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
    ```
 
 3. **S3 Sync:**
