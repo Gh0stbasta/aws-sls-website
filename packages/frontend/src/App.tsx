@@ -3,6 +3,9 @@ import { useTheme } from './contexts/ThemeContext'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { HeroSection } from './sections/HeroSection'
+import { QuickStartSection } from './sections/QuickStartSection'
+import { CodeExamplesSection } from './sections/CodeExamplesSection'
+import { ArchitectureSection } from './sections/ArchitectureSection'
 import { heroData } from './data/hero'
 import { fadeInUp } from './animations/variants'
 
@@ -14,6 +17,7 @@ function App() {
       <Header onThemeToggle={toggleTheme} />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200">
         <HeroSection {...heroData} />
+        <ArchitectureSection />
 
         {/* Placeholder sections for navigation */}
         <motion.div 
@@ -26,6 +30,9 @@ function App() {
         >
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Quick Start Section</h2>
         </motion.div>
+        <QuickStartSection />
+
+        <CodeExamplesSection />
 
         <motion.div 
           id="features" 
