@@ -48,21 +48,21 @@ jobs:
         uses: actions/checkout@v4
       
       # =========================================================================
-      # Step 2: Setup Node.js Environment
+      # Step 2: Install pnpm Package Manager
+      # =========================================================================
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      
+      # =========================================================================
+      # Step 3: Setup Node.js Environment
       # =========================================================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      
-      # =========================================================================
-      # Step 3: Install pnpm Package Manager
-      # =========================================================================
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
       
       # =========================================================================
       # Step 4: Install Dependencies
@@ -82,18 +82,19 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       
       # =========================================================================
-      # Step 6: Build Frontend
-      # =========================================================================
-      - name: Build Frontend
-        run: cd packages/frontend && pnpm run build
-      
-      # =========================================================================
-      # Step 7: Deploy Infrastructure (CDK)
+      # Step 6: Deploy Infrastructure (CDK)
       # =========================================================================
       # CDK automatically detects if infrastructure has changed
       # Skips deployment if no changes detected
+      # This must run before frontend build to ensure S3 bucket exists
       - name: Deploy Infrastructure (CDK)
         run: cd packages/infrastructure && pnpm run cdk:deploy
+      
+      # =========================================================================
+      # Step 7: Build Frontend
+      # =========================================================================
+      - name: Build Frontend
+        run: cd packages/frontend && pnpm run build
       
       # =========================================================================
       # Step 8: Deploy Frontend to S3

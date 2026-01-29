@@ -20,12 +20,12 @@ This document describes the automated CI/CD pipeline for deploying the serverles
 
 **Steps:**
 1. Checkout code
-2. Setup Node.js 20 with pnpm cache
-3. Install pnpm package manager
+2. Install pnpm package manager
+3. Setup Node.js 20 with pnpm cache
 4. Install dependencies (`pnpm install`)
 5. Configure AWS credentials using OIDC
-6. Build frontend (`packages/frontend`)
-7. Deploy infrastructure via CDK (if changes detected)
+6. Deploy infrastructure via CDK (if changes detected)
+7. Build frontend (`packages/frontend`)
 8. Sync frontend to S3 bucket
 9. Invalidate CloudFront cache
 
@@ -56,6 +56,7 @@ This pipeline uses **OpenID Connect (OIDC)** for secure, temporary AWS credentia
 ### Prerequisites
 
 - AWS Account
+- AWS CDK bootstrapped in target account and region (run `cdk bootstrap` if not already completed)
 - GitHub repository
 
 ### Step 1: Create OIDC Identity Provider in AWS
@@ -156,7 +157,10 @@ Create and attach a policy with the following permissions:
       "Sid": "CDKAssetBucket",
       "Effect": "Allow",
       "Action": [
-        "s3:*"
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:DeleteObject"
       ],
       "Resource": [
         "arn:aws:s3:::cdk-*-assets-YOUR_ACCOUNT_ID-*",
@@ -166,6 +170,8 @@ Create and attach a policy with the following permissions:
   ]
 }
 ```
+
+**Note on CDK Permissions:** The above policy covers the basic deployment needs. For full CDK infrastructure deployment (creating S3 buckets, CloudFront distributions, IAM roles, etc.), additional permissions are required. During initial setup, you may need broader permissions or consider using AWS's recommended CDK execution policy. After the infrastructure is deployed, you can restrict the role to the minimal permissions shown above for ongoing deployments.
 
 Replace:
 - `YOUR_BUCKET_NAME` with your S3 bucket name
@@ -301,9 +307,9 @@ After deployment, access your website at:
 
 ### Cache Usage
 
-- Node.js modules cached between runs
-- pnpm store cached
-- Reduces install time by ~50%
+- pnpm modules cached between runs (after pnpm is installed)
+- Node.js setup uses pnpm cache
+- Reduces install time for subsequent runs
 
 ### Parallel Operations
 
