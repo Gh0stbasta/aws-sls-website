@@ -71,7 +71,53 @@ jobs:
         run: pnpm install --frozen-lockfile
       
       # =========================================================================
-      # Step 5: Configure AWS Credentials (OIDC)
+      # Step 5: Validate Required Secrets
+      # =========================================================================
+      # Check that all required GitHub secrets are configured
+      # Provides helpful error messages if any are missing
+      - name: Validate Required Secrets
+        run: |
+          echo "Validating required GitHub secrets..."
+          
+          MISSING_SECRETS=()
+          
+          if [ -z "${{ secrets.AWS_ROLE_ARN }}" ]; then
+            MISSING_SECRETS+=("AWS_ROLE_ARN")
+          fi
+          
+          if [ -z "${{ secrets.AWS_REGION }}" ]; then
+            MISSING_SECRETS+=("AWS_REGION")
+          fi
+          
+          if [ -z "${{ secrets.WEBSITE_BUCKET }}" ]; then
+            MISSING_SECRETS+=("WEBSITE_BUCKET")
+          fi
+          
+          if [ -z "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ]; then
+            MISSING_SECRETS+=("CLOUDFRONT_DISTRIBUTION_ID")
+          fi
+          
+          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
+            echo "❌ ERROR: The following required secrets are not configured:"
+            for secret in "${MISSING_SECRETS[@]}"; do
+              echo "  - $secret"
+            done
+            echo ""
+            echo "📚 Setup Instructions:"
+            echo "  1. See docs/TROUBLESHOOTING.md for complete setup guide"
+            echo "  2. Configure secrets at: Settings → Secrets and variables → Actions"
+            echo "  3. Required secrets: AWS_ROLE_ARN, AWS_REGION, WEBSITE_BUCKET, CLOUDFRONT_DISTRIBUTION_ID"
+            echo ""
+            echo "🔗 Quick links:"
+            echo "  - Troubleshooting: https://github.com/${{ github.repository }}/blob/main/docs/TROUBLESHOOTING.md#github-actions-aws-credentials-error"
+            echo "  - Secrets Setup: https://github.com/${{ github.repository }}/blob/main/docs/GITHUB-SECRETS.md"
+            exit 1
+          fi
+          
+          echo "✅ All required secrets are configured"
+      
+      # =========================================================================
+      # Step 6: Configure AWS Credentials (OIDC)
       # =========================================================================
       # Uses OpenID Connect to obtain temporary AWS credentials
       # No long-lived access keys stored in repository
@@ -82,7 +128,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       
       # =========================================================================
-      # Step 6: Deploy Infrastructure (CDK)
+      # Step 7: Deploy Infrastructure (CDK)
       # =========================================================================
       # CDK automatically detects if infrastructure has changed
       # Skips deployment if no changes detected
@@ -91,13 +137,13 @@ jobs:
         run: cd packages/infrastructure && pnpm run cdk:deploy
       
       # =========================================================================
-      # Step 7: Build Frontend
+      # Step 8: Build Frontend
       # =========================================================================
       - name: Build Frontend
         run: cd packages/frontend && pnpm run build
       
       # =========================================================================
-      # Step 8: Deploy Frontend to S3
+      # Step 9: Deploy Frontend to S3
       # =========================================================================
       # Syncs frontend build artifacts to S3 bucket
       # --delete: Remove files in S3 that don't exist locally (clean deployment)
@@ -109,7 +155,7 @@ jobs:
             --quiet
       
       # =========================================================================
-      # Step 9: Invalidate CloudFront Cache
+      # Step 10: Invalidate CloudFront Cache
       # =========================================================================
       # Creates cache invalidation to ensure users get latest content
       # Output redirected to /dev/null to avoid logging distribution details
