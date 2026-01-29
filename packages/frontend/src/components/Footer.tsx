@@ -1,14 +1,8 @@
 import React from 'react';
+import { scrollToSection } from '../utils/navigation';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <footer className="bg-slate-100 dark:bg-slate-800 transition-colors duration-200">

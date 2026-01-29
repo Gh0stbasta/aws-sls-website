@@ -1,16 +1,11 @@
 import React from 'react';
+import { scrollToSection } from '../utils/navigation';
 
 interface HeaderProps {
   onThemeToggle?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onThemeToggle }) => {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <header className="sticky top-0 bg-white dark:bg-slate-900 shadow-sm z-50 transition-colors duration-200">
