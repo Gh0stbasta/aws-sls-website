@@ -93,11 +93,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       
       # =========================================================================
-      # Step 7: Get Stack Outputs (for S3 bucket cleanup)
+      # Step 7: Check Stack Existence
       # =========================================================================
-      # Retrieve bucket name from CDK stack before destroying
-      - name: Get Stack Outputs
-        id: stack-outputs
+      # Verify that the stack exists before attempting to destroy
+      - name: Check Stack Existence
+        id: check-stack
         run: |
           STACK_NAME="WebsiteStack"
           
@@ -108,74 +108,26 @@ jobs:
             exit 0
           fi
           
+          echo "Stack $STACK_NAME exists. Proceeding with destruction..."
           echo "stack-exists=true" >> $GITHUB_OUTPUT
-          
-          BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name $STACK_NAME \
-            --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' \
-            --output text)
-          
-          # Validate bucket name is not empty
-          if [ -z "$BUCKET_NAME" ]; then
-            echo "Warning: BucketName output not found in stack $STACK_NAME"
-            echo "Skipping S3 cleanup step..."
-            echo "bucket-name=" >> $GITHUB_OUTPUT
-          else
-            echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
-          fi
       
       # =========================================================================
-      # Step 8: Empty S3 Bucket
-      # =========================================================================
-      # S3 buckets must be empty before CloudFormation can delete them
-      # This step removes all objects and versions from the bucket
-      - name: Empty S3 Bucket
-        if: steps.stack-outputs.outputs.stack-exists == 'true' && steps.stack-outputs.outputs.bucket-name != ''
-        run: |
-          BUCKET_NAME="${{ steps.stack-outputs.outputs.bucket-name }}"
-          echo "Emptying S3 bucket: $BUCKET_NAME"
-          
-          # Delete all object versions and delete markers
-          aws s3api list-object-versions \
-            --bucket "$BUCKET_NAME" \
-            --query 'Versions[].{Key:Key,VersionId:VersionId}' \
-            --output json | \
-          jq -r '.[] | "\(.Key) \(.VersionId)"' | \
-          while read -r key version; do
-            aws s3api delete-object --bucket "$BUCKET_NAME" --key "$key" --version-id "$version" || true
-          done
-          
-          # Delete all delete markers
-          aws s3api list-object-versions \
-            --bucket "$BUCKET_NAME" \
-            --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' \
-            --output json | \
-          jq -r '.[] | "\(.Key) \(.VersionId)"' | \
-          while read -r key version; do
-            aws s3api delete-object --bucket "$BUCKET_NAME" --key "$key" --version-id "$version" || true
-          done
-          
-          # Delete all objects (for non-versioned buckets)
-          aws s3 rm s3://$BUCKET_NAME --recursive || true
-          
-          echo "S3 bucket emptied successfully"
-      
-      # =========================================================================
-      # Step 9: Destroy CDK Stack
+      # Step 8: Destroy CDK Stack
       # =========================================================================
       # Destroys all infrastructure (S3, CloudFront, etc.)
+      # CDK automatically empties S3 bucket via autoDeleteObjects custom resource
       # Uses --force flag to skip confirmation prompts
       - name: Destroy CDK Stack
-        if: steps.stack-outputs.outputs.stack-exists == 'true'
+        if: steps.check-stack.outputs.stack-exists == 'true'
         run: cd packages/infrastructure && pnpm run cdk:destroy
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       
       # =========================================================================
-      # Step 10: Confirm Destruction
+      # Step 9: Confirm Destruction
       # =========================================================================
       - name: Confirm Destruction
-        if: steps.stack-outputs.outputs.stack-exists == 'true'
+        if: steps.check-stack.outputs.stack-exists == 'true'
         run: |
           echo "✅ Infrastructure successfully destroyed"
           echo "All AWS resources have been removed"
