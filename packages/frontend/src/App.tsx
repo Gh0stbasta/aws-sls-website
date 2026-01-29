@@ -11,10 +11,10 @@ function App() {
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200">
       <div className="flex flex-col items-center justify-center min-h-screen p-8">
         <div className="flex gap-8 mb-8">
-          <a href="https://vite.dev" target="_blank" className="transition-transform hover:scale-110">
+          <a href="https://vite.dev" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
             <img src={viteLogo} className="h-24 w-24" alt="Vite logo" />
           </a>
-          <a href="https://react.dev" target="_blank" className="transition-transform hover:scale-110 animate-spin-slow">
+          <a href="https://react.dev" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
             <img src={reactLogo} className="h-24 w-24" alt="React logo" />
           </a>
         </div>

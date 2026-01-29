@@ -18,8 +18,13 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   // Initialize theme from localStorage or default to 'light'
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    return savedTheme || 'light';
+    try {
+      const savedTheme = localStorage.getItem('theme') as Theme | null;
+      return savedTheme || 'light';
+    } catch {
+      // If localStorage is not available, default to light theme
+      return 'light';
+    }
   });
 
   useEffect(() => {
@@ -32,7 +37,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.classList.add(theme);
     
     // Persist theme to localStorage
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {
+      // Silently fail if localStorage is not available
+    }
   }, [theme]);
 
   const toggleTheme = () => {
