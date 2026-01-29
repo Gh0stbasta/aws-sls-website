@@ -140,16 +140,20 @@ jobs:
             --bucket "$BUCKET_NAME" \
             --query 'Versions[].{Key:Key,VersionId:VersionId}' \
             --output json | \
-          jq -r '.[] | "--key \"\(.Key)\" --version-id \"\(.VersionId)\""' | \
-          xargs -I {} sh -c 'aws s3api delete-object --bucket "$BUCKET_NAME" {}' || true
+          jq -r '.[] | "\(.Key) \(.VersionId)"' | \
+          while read -r key version; do
+            aws s3api delete-object --bucket "$BUCKET_NAME" --key "$key" --version-id "$version" || true
+          done
           
           # Delete all delete markers
           aws s3api list-object-versions \
             --bucket "$BUCKET_NAME" \
             --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' \
             --output json | \
-          jq -r '.[] | "--key \"\(.Key)\" --version-id \"\(.VersionId)\""' | \
-          xargs -I {} sh -c 'aws s3api delete-object --bucket "$BUCKET_NAME" {}' || true
+          jq -r '.[] | "\(.Key) \(.VersionId)"' | \
+          while read -r key version; do
+            aws s3api delete-object --bucket "$BUCKET_NAME" --key "$key" --version-id "$version" || true
+          done
           
           # Delete all objects (for non-versioned buckets)
           aws s3 rm s3://$BUCKET_NAME --recursive || true
