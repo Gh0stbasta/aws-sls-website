@@ -75,6 +75,8 @@ jobs:
       # =========================================================================
       # Check that all required GitHub secrets are configured
       # Provides helpful error messages if any are missing
+      # Note: This checks if secrets are empty, treating both unset secrets
+      # and secrets set to empty strings as missing (both are configuration errors)
       - name: Validate Required Secrets
         run: |
           echo "Validating required GitHub secrets..."

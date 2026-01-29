@@ -330,7 +330,9 @@ Create and attach permissions for the role:
 1. Go to the role → **Permissions** tab
 2. Click **Add permissions** → **Create inline policy**
 3. Switch to **JSON** view
-4. Paste this policy (**update YOUR_BUCKET_NAME if you already have a bucket**):
+4. Paste this policy:
+
+> **Note:** The policy below grants broad permissions to support initial CDK deployment. After your infrastructure is deployed, you should restrict these permissions. See the "Restrictive Policy" section at the end of this guide.
 
 ```json
 {
@@ -346,8 +348,8 @@ Create and attach permissions for the role:
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::*-website-*",
-        "arn:aws:s3:::*-website-*/*"
+        "arn:aws:s3:::aws-sls-website-*",
+        "arn:aws:s3:::aws-sls-website-*/*"
       ]
     },
     {
@@ -360,7 +362,7 @@ Create and attach permissions for the role:
       "Resource": "*"
     },
     {
-      "Sid": "CDKDeploymentPermissions",
+      "Sid": "CloudFormationStackManagement",
       "Effect": "Allow",
       "Action": [
         "cloudformation:DescribeStacks",
@@ -374,7 +376,10 @@ Create and attach permissions for the role:
         "cloudformation:DeleteStack",
         "cloudformation:GetTemplateSummary"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:cloudformation:*:*:stack/WebsiteStack/*",
+        "arn:aws:cloudformation:*:*:stack/CDKToolkit/*"
+      ]
     },
     {
       "Sid": "CDKResourceCreation",
@@ -384,11 +389,20 @@ Create and attach permissions for the role:
         "s3:DeleteBucket",
         "s3:PutBucketPolicy",
         "s3:PutBucketPublicAccessBlock",
+        "s3:PutBucketWebsite",
+        "s3:GetBucketLocation",
         "cloudfront:CreateDistribution",
         "cloudfront:UpdateDistribution",
         "cloudfront:DeleteDistribution",
         "cloudfront:GetDistribution",
-        "cloudfront:TagResource",
+        "cloudfront:TagResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CDKIAMRoleManagement",
+      "Effect": "Allow",
+      "Action": [
         "iam:CreateRole",
         "iam:DeleteRole",
         "iam:PutRolePolicy",
@@ -396,9 +410,13 @@ Create and attach permissions for the role:
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
         "iam:GetRole",
-        "iam:PassRole"
+        "iam:PassRole",
+        "iam:TagRole"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:iam::*:role/cdk-*",
+        "arn:aws:iam::*:role/WebsiteStack-*"
+      ]
     },
     {
       "Sid": "CDKAssetBucket",
@@ -483,6 +501,57 @@ Now add all 4 secrets to your repository:
 5. Click **Run workflow**
 
 The workflow should now succeed! ✅
+
+#### Step 6: (Optional) Restrict Permissions After Deployment
+
+After your infrastructure is successfully deployed, you can tighten the IAM role permissions for better security:
+
+**Restrictive Policy (After Infrastructure Exists):**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3BucketAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::YOUR_ACTUAL_BUCKET_NAME",
+        "arn:aws:s3:::YOUR_ACTUAL_BUCKET_NAME/*"
+      ]
+    },
+    {
+      "Sid": "CloudFrontInvalidation",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:CreateInvalidation",
+        "cloudfront:GetInvalidation"
+      ],
+      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:distribution/YOUR_DISTRIBUTION_ID"
+    },
+    {
+      "Sid": "CloudFormationReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:GetTemplate"
+      ],
+      "Resource": "arn:aws:cloudformation:*:*:stack/WebsiteStack/*"
+    }
+  ]
+}
+```
+
+Replace:
+- `YOUR_ACTUAL_BUCKET_NAME` with your bucket (from Step 3 output)
+- `YOUR_ACCOUNT_ID` with your AWS account ID
+- `YOUR_DISTRIBUTION_ID` with your CloudFront distribution ID
 
 **Related Documentation:**
 - [CI/CD Pipeline Documentation](CICD.md)
