@@ -231,6 +231,266 @@ pnpm run lint --fix
 
 ## Deployment Issues
 
+### GitHub Actions: AWS Credentials Error
+
+**Problem:** GitHub Actions workflow fails with:
+```
+Run aws-actions/configure-aws-credentials@v4
+Error: Credentials could not be loaded, please check your action inputs: 
+Could not load credentials from any providers
+```
+
+**Cause:**
+The GitHub Actions workflow cannot authenticate with AWS because required GitHub secrets are missing or incorrectly configured. This workflow uses **AWS OIDC (OpenID Connect)** for secure, temporary credential generation.
+
+**Solution - Complete Setup Checklist:**
+
+#### Step 1: Verify GitHub Secrets Are Configured
+
+Go to your repository: **Settings → Secrets and variables → Actions**
+
+Ensure these 4 secrets exist:
+
+| Secret Name | Example Value | Where to Get It |
+|------------|---------------|-----------------|
+| `AWS_ROLE_ARN` | `arn:aws:iam::123456789012:role/github-actions-deployment-role` | From Step 2 below |
+| `AWS_REGION` | `us-east-1` | Your preferred AWS region |
+| `WEBSITE_BUCKET` | `aws-sls-website-prod-xxxxx` | From CDK deployment output (Step 3) |
+| `CLOUDFRONT_DISTRIBUTION_ID` | `E1234ABCDEFGH` | From CDK deployment output (Step 3) |
+
+**If any secrets are missing, continue to Steps 2-4 below.**
+
+#### Step 2: Create AWS OIDC Provider and IAM Role
+
+This is required for GitHub Actions to securely authenticate with AWS.
+
+**A. Create OIDC Identity Provider**
+
+1. Open [AWS IAM Console](https://console.aws.amazon.com/iam/) → **Identity Providers**
+2. Click **Add provider**
+3. Configure:
+   - **Provider type:** OpenID Connect
+   - **Provider URL:** `https://token.actions.githubusercontent.com`
+   - **Audience:** `sts.amazonaws.com`
+4. Click **Add provider**
+
+**B. Create IAM Deployment Role**
+
+1. Go to **IAM Console** → **Roles** → **Create role**
+2. Select **Trusted entity type:** Web identity
+3. Select **Identity provider:** `token.actions.githubusercontent.com`
+4. Select **Audience:** `sts.amazonaws.com`
+5. Click **Next**
+6. Skip permissions for now (we'll add them in step D)
+7. Name the role: `github-actions-deployment-role`
+8. Click **Create role**
+
+**C. Configure Trust Policy**
+
+After creating the role, edit its trust relationship:
+
+1. Go to the role details page
+2. Click **Trust relationships** tab
+3. Click **Edit trust policy**
+4. Replace with this policy (**update the placeholders**):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::YOUR_ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:YOUR_GITHUB_USERNAME/YOUR_REPO_NAME:ref:refs/heads/main"
+        }
+      }
+    }
+  ]
+}
+```
+
+Replace:
+- `YOUR_ACCOUNT_ID` → Your 12-digit AWS account ID (e.g., `123456789012`)
+- `YOUR_GITHUB_USERNAME/YOUR_REPO_NAME` → Your GitHub username and repository name (e.g., `octocat/my-website`)
+
+5. Click **Update policy**
+
+**D. Attach Permissions Policy**
+
+Create and attach permissions for the role:
+
+1. Go to the role → **Permissions** tab
+2. Click **Add permissions** → **Create inline policy**
+3. Switch to **JSON** view
+4. Paste this policy (**update YOUR_BUCKET_NAME if you already have a bucket**):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3BucketAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*-website-*",
+        "arn:aws:s3:::*-website-*/*"
+      ]
+    },
+    {
+      "Sid": "CloudFrontInvalidation",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:CreateInvalidation",
+        "cloudfront:GetInvalidation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CDKDeploymentPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:CreateChangeSet",
+        "cloudformation:ExecuteChangeSet",
+        "cloudformation:DescribeChangeSet",
+        "cloudformation:DeleteChangeSet",
+        "cloudformation:GetTemplate",
+        "cloudformation:CreateStack",
+        "cloudformation:UpdateStack",
+        "cloudformation:DeleteStack",
+        "cloudformation:GetTemplateSummary"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CDKResourceCreation",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:PutBucketPolicy",
+        "s3:PutBucketPublicAccessBlock",
+        "cloudfront:CreateDistribution",
+        "cloudfront:UpdateDistribution",
+        "cloudfront:DeleteDistribution",
+        "cloudfront:GetDistribution",
+        "cloudfront:TagResource",
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:GetRole",
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CDKAssetBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::cdk-*-assets-*",
+        "arn:aws:s3:::cdk-*-assets-*/*"
+      ]
+    }
+  ]
+}
+```
+
+5. Name the policy: `GitHubActionsDeploymentPolicy`
+6. Click **Create policy**
+
+**E. Copy the Role ARN**
+
+1. Go to the role summary page
+2. Copy the **ARN** (looks like `arn:aws:iam::123456789012:role/github-actions-deployment-role`)
+3. Save this for Step 4
+
+#### Step 3: Deploy Infrastructure Locally (First Time)
+
+Before GitHub Actions can deploy, you need to create the S3 bucket and CloudFront distribution:
+
+```bash
+# 1. Configure AWS CLI with your credentials
+aws configure
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Bootstrap CDK (first time only)
+cd packages/infrastructure
+pnpm run cdk:bootstrap
+
+# 4. Deploy the infrastructure
+pnpm run cdk:deploy
+
+# The output will show:
+# WebsiteStack.WebsiteBucketName = aws-sls-website-prod-xxxxx
+# WebsiteStack.CloudFrontDistributionId = E1234ABCDEFGH
+#
+# SAVE THESE VALUES - you'll need them for GitHub secrets
+```
+
+#### Step 4: Add All Secrets to GitHub
+
+Now add all 4 secrets to your repository:
+
+1. Go to repository: **Settings → Secrets and variables → Actions**
+2. Click **New repository secret** for each:
+
+   **Secret 1:**
+   - Name: `AWS_ROLE_ARN`
+   - Value: `arn:aws:iam::123456789012:role/github-actions-deployment-role` (from Step 2E)
+
+   **Secret 2:**
+   - Name: `AWS_REGION`
+   - Value: `us-east-1` (or your chosen region)
+
+   **Secret 3:**
+   - Name: `WEBSITE_BUCKET`
+   - Value: The bucket name from Step 3 output (e.g., `aws-sls-website-prod-xxxxx`)
+
+   **Secret 4:**
+   - Name: `CLOUDFRONT_DISTRIBUTION_ID`
+   - Value: The distribution ID from Step 3 output (e.g., `E1234ABCDEFGH`)
+
+#### Step 5: Test the Workflow
+
+1. Go to **Actions** tab in your repository
+2. Select **Deploy to AWS** workflow
+3. Click **Run workflow**
+4. Select `main` branch
+5. Click **Run workflow**
+
+The workflow should now succeed! ✅
+
+**Related Documentation:**
+- [CI/CD Pipeline Documentation](CICD.md)
+- [GitHub Secrets Reference](GITHUB-SECRETS.md)
+- [ADR-004: Security & Deployment](adrs/ADR-004-security-deployment.md)
+
+---
+
 ### CDK Bootstrap Errors
 
 **Problem:** `cdk bootstrap` fails or shows "CDK not bootstrapped".

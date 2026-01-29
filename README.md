@@ -130,16 +130,20 @@ pnpm run test                  # Test all packages
 
 ## 🚢 Deployment
 
+> **⚠️ IMPORTANT:** Before GitHub Actions can deploy automatically, you must complete the one-time setup below. If you see the error "Credentials could not be loaded", see [Troubleshooting](docs/TROUBLESHOOTING.md#github-actions-aws-credentials-error).
+
 ### Prerequisites
 
-- AWS Account with OIDC Provider + Deployment Role configured
-- GitHub Secrets set (see [docs/GITHUB-SECRETS.md](docs/GITHUB-SECRETS.md)):
-  - `AWS_ROLE_ARN`
-  - `AWS_REGION`
-  - `WEBSITE_BUCKET`
-  - `CLOUDFRONT_DISTRIBUTION_ID`
+**Required for automated deployments:**
 
-For detailed setup instructions, see [CI/CD Documentation](docs/CICD.md).
+1. **AWS Account** with OIDC Provider + Deployment Role configured
+2. **GitHub Secrets** configured (see [docs/GITHUB-SECRETS.md](docs/GITHUB-SECRETS.md)):
+   - `AWS_ROLE_ARN` - IAM role ARN for GitHub Actions
+   - `AWS_REGION` - AWS region (e.g., `us-east-1`)
+   - `WEBSITE_BUCKET` - S3 bucket name from CDK deployment
+   - `CLOUDFRONT_DISTRIBUTION_ID` - CloudFront distribution ID from CDK deployment
+
+**First-time setup guide:** See [CI/CD Documentation](docs/CICD.md) for complete step-by-step instructions.
 
 ### Automatic Deployment (Recommended)
 
