@@ -10,7 +10,7 @@
 # 
 # Security:
 #   - Uses AWS OIDC (OpenID Connect) for authentication (no long-lived credentials)
-#   - Requires GitHub Secrets: AWS_ROLE_ARN, AWS_REGION, WEBSITE_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
+#   - Requires GitHub Secrets: AWS_ACCOUNT_ID, AWS_DEPLOY_ROLE_ARN, AWS_REGION
 #   - Secrets are automatically masked in logs
 # 
 # Related ADRs:
@@ -78,7 +78,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
       
       # =========================================================================
@@ -89,33 +89,66 @@ jobs:
       # This must run before frontend build to ensure S3 bucket exists
       - name: Deploy Infrastructure (CDK)
         run: cd packages/infrastructure && pnpm run cdk:deploy
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       
       # =========================================================================
-      # Step 7: Build Frontend
+      # Step 7: Get Stack Outputs
+      # =========================================================================
+      # Retrieve bucket name and CloudFront distribution ID from CDK stack
+      - name: Get Stack Outputs
+        id: stack-outputs
+        run: |
+          STACK_NAME="WebsiteStack"
+          
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' \
+            --output text)
+          DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' \
+            --output text)
+          
+          # Validate outputs are not empty
+          if [ -z "$BUCKET_NAME" ]; then
+            echo "Error: BucketName output not found in stack $STACK_NAME"
+            exit 1
+          fi
+          if [ -z "$DISTRIBUTION_ID" ]; then
+            echo "Error: DistributionId output not found in stack $STACK_NAME"
+            exit 1
+          fi
+          
+          echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+          echo "distribution-id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
+      
+      # =========================================================================
+      # Step 8: Build Frontend
       # =========================================================================
       - name: Build Frontend
         run: cd packages/frontend && pnpm run build
       
       # =========================================================================
-      # Step 8: Deploy Frontend to S3
+      # Step 9: Deploy Frontend to S3
       # =========================================================================
       # Syncs frontend build artifacts to S3 bucket
       # --delete: Remove files in S3 that don't exist locally (clean deployment)
       # --quiet: Suppress verbose output (prevents secrets from appearing in logs)
       - name: Deploy Frontend to S3
         run: |
-          aws s3 sync packages/frontend/dist s3://${{ secrets.WEBSITE_BUCKET }} \
+          aws s3 sync packages/frontend/dist s3://${{ steps.stack-outputs.outputs.bucket-name }} \
             --delete \
             --quiet
       
       # =========================================================================
-      # Step 9: Invalidate CloudFront Cache
+      # Step 10: Invalidate CloudFront Cache
       # =========================================================================
       # Creates cache invalidation to ensure users get latest content
       # Output redirected to /dev/null to avoid logging distribution details
       - name: Invalidate CloudFront Cache
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${{ steps.stack-outputs.outputs.distribution-id }} \
             --paths "/*" \
             > /dev/null

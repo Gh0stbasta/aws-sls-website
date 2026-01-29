@@ -38,7 +38,7 @@ Sicherheitsrisiken bei unzureichender Verwaltung:
 3. **GitHub Secrets für Nicht-Credential Daten**
    - `AWS_ACCOUNT_ID` - AWS Account Number
    - `AWS_REGION` - Deployment Region
-   - `AWS_ROLE_ARN` - ARN der Deployment Role (nicht secret, aber versionierbar)
+   - `AWS_DEPLOY_ROLE_ARN` - ARN der Deployment Role (nicht secret, aber versionierbar)
    - Sämtliche sensiblen Values: Masked in Logs
 
 4. **Output Masking & Logging Control**
@@ -161,13 +161,14 @@ Nicht enthalten: EC2, RDS, IAM, Secrets Manager, etc.
 - [x] **GitHub Secrets:** ✅ Bereits im Repository
   - [x] `AWS_ACCOUNT_ID` - 12-stellige Account Number
   - [x] `AWS_REGION` - Deployment Region
-  - [x] `AWS_ROLE_ARN` - Full ARN der Deployment Role
+  - [x] `AWS_DEPLOY_ROLE_ARN` - Full ARN der Deployment Role
 
-- [ ] **Workflow File (.github/workflows/deploy.yml):**
-  - [ ] `permissions: id-token: write` für OIDC
-  - [ ] `aws-actions/configure-aws-credentials` mit OIDC Mode
-  - [ ] Output Redirection für sensible Operationen (`> /dev/null`)
-  - [ ] `--quiet` Flag für aws-cli
+- [x] **Workflow File (.github/workflows/deploy.yml):**
+  - [x] `permissions: id-token: write` für OIDC
+  - [x] `aws-actions/configure-aws-credentials` mit OIDC Mode
+  - [x] Output Redirection für sensible Operationen (`> /dev/null`)
+  - [x] `--quiet` Flag für aws-cli
+  - [x] Automatisches Abrufen von Bucket und Distribution ID aus Stack Outputs
 
 ---
 

@@ -107,29 +107,29 @@ Trigger: Push to main
 
 **Key Steps:**
 
-1. **AWS Credentials Setup:**
+1. **AWS Credentials Setup (OIDC):**
    ```yaml
    - uses: aws-actions/configure-aws-credentials@v4
      with:
-       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-       aws-region: us-east-1
+       role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+       aws-region: ${{ secrets.AWS_REGION }}
    ```
 
 2. **CDK Deployment (only if infrastructure changed):**
    ```yaml
    - name: Deploy CDK
      run: |
-       cd infrastructure
-       npm ci
-       npx cdk deploy --require-approval never
+       cd packages/infrastructure
+       pnpm run cdk:deploy
+     env:
+       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
    ```
 
 3. **S3 Sync:**
    ```yaml
    - name: Sync to S3
      run: |
-       aws s3 sync frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
+       aws s3 sync frontend/dist s3://${{ steps.stack-outputs.outputs.bucket-name }} --delete
    ```
 
 4. **CloudFront Invalidation:**
@@ -137,16 +137,17 @@ Trigger: Push to main
    - name: Invalidate CloudFront
      run: |
        aws cloudfront create-invalidation \
-         --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+         --distribution-id ${{ steps.stack-outputs.outputs.distribution-id }} \
          --paths "/*"
    ```
 
 ### Required GitHub Secrets
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `S3_BUCKET_NAME` (output from CDK)
-- `CLOUDFRONT_DISTRIBUTION_ID` (output from CDK)
+- `AWS_ACCOUNT_ID`
+- `AWS_DEPLOY_ROLE_ARN`
+- `AWS_REGION`
+
+**Note:** Bucket name and CloudFront distribution ID are retrieved automatically from CDK stack outputs.
 
 ### IAM Policy (Least Privilege)
 

@@ -8,10 +8,9 @@ Configure these secrets in: **Settings → Secrets and variables → Actions**
 
 | Secret Name | Description | Example | How to Get |
 |------------|-------------|---------|------------|
-| `AWS_ROLE_ARN` | ARN of the GitHub Actions deployment role | `arn:aws:iam::123456789012:role/github-actions-deployment-role` | AWS IAM Console → Roles → Copy ARN |
+| `AWS_ACCOUNT_ID` | Your AWS account ID | `123456789012` | AWS Console → Top right → Account dropdown |
+| `AWS_DEPLOY_ROLE_ARN` | ARN of the GitHub Actions deployment role | `arn:aws:iam::123456789012:role/github-actions-deployment-role` | AWS IAM Console → Roles → Copy ARN |
 | `AWS_REGION` | AWS region for deployment | `us-east-1` | Choose your preferred region |
-| `WEBSITE_BUCKET` | S3 bucket name for website files | `aws-sls-website-prod` | From CDK deployment output |
-| `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID | `E1234ABCDEFGH` | From CDK deployment output or CloudFront Console |
 
 ## Setup Instructions
 
@@ -21,18 +20,21 @@ Configure these secrets in: **Settings → Secrets and variables → Actions**
    pnpm install
    pnpm run cdk:deploy
    ```
-   This will output the `WEBSITE_BUCKET` and `CLOUDFRONT_DISTRIBUTION_ID` values.
+   The workflow will automatically retrieve the bucket name and CloudFront distribution ID from the stack outputs.
 
 2. **Configure OIDC** in AWS (see [docs/CICD.md](CICD.md) for detailed steps):
    - Create OIDC identity provider
    - Create deployment role with trust relationship
-   - Note the Role ARN
+   - Note the Role ARN and your AWS Account ID
 
 3. **Add Secrets to GitHub**:
    - Go to repository **Settings**
    - Click **Secrets and variables** → **Actions**
    - Click **New repository secret** for each secret
-   - Paste the values from steps 1 and 2
+   - Add the following secrets:
+     - `AWS_ACCOUNT_ID`: Your AWS account ID (e.g., `123456789012`)
+     - `AWS_DEPLOY_ROLE_ARN`: The deployment role ARN from step 2
+     - `AWS_REGION`: Your preferred AWS region (e.g., `us-east-1`)
 
 ## Verification
 
