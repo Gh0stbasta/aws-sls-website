@@ -2,14 +2,26 @@ import React from 'react';
 import { architectureNodes, architectureFlows, type ArchitectureNode } from '../data/architecture';
 
 /**
- * Color configuration for node types
- * Centralized to avoid duplication and ensure consistency
+ * Node type styling configurations
+ * Using complete className strings to ensure Tailwind can detect and include these classes
  */
-const NODE_TYPE_COLORS: Record<ArchitectureNode['type'], { gradient: string; border: string; solid: string }> = {
-  client: { gradient: 'from-blue-400 to-blue-600', border: 'border-blue-500', solid: 'bg-blue-500' },
-  cdn: { gradient: 'from-purple-400 to-purple-600', border: 'border-purple-500', solid: 'bg-purple-500' },
-  storage: { gradient: 'from-green-400 to-green-600', border: 'border-green-500', solid: 'bg-green-500' },
-  deployment: { gradient: 'from-orange-400 to-orange-600', border: 'border-orange-500', solid: 'bg-orange-500' },
+const NODE_TYPE_STYLES: Record<ArchitectureNode['type'], { containerClass: string; legendClass: string }> = {
+  client: { 
+    containerClass: 'bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-blue-500',
+    legendClass: 'w-4 h-4 rounded bg-blue-500'
+  },
+  cdn: { 
+    containerClass: 'bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-purple-500',
+    legendClass: 'w-4 h-4 rounded bg-purple-500'
+  },
+  storage: { 
+    containerClass: 'bg-gradient-to-br from-green-400 to-green-600 border-2 border-green-500',
+    legendClass: 'w-4 h-4 rounded bg-green-500'
+  },
+  deployment: { 
+    containerClass: 'bg-gradient-to-br from-orange-400 to-orange-600 border-2 border-orange-500',
+    legendClass: 'w-4 h-4 rounded bg-orange-500'
+  },
 };
 
 /**
@@ -30,7 +42,7 @@ export const ArchitectureSection: React.FC = () => {
   // Create a map for efficient node lookups
   const nodeMap = React.useMemo(() => {
     return new Map(architectureNodes.map(node => [node.id, node]));
-  }, [architectureNodes]);
+  }, []);
 
   // Helper to safely get nodes
   const getNode = (id: string) => nodeMap.get(id);
@@ -61,9 +73,9 @@ export const ArchitectureSection: React.FC = () => {
             <div className="relative">
               {/* SVG for connection lines */}
               <svg 
-                className="absolute top-0 left-0 w-full h-full pointer-events-none" 
-                style={{ zIndex: 0 }}
+                className="absolute top-0 left-0 w-full h-full pointer-events-none z-0" 
                 viewBox="0 0 100 100"
+                preserveAspectRatio="none"
               >
                 {/* GitHub to Actions */}
                 <line x1="20%" y1="25%" x2="20%" y2="40%" className="stroke-gray-400 dark:stroke-gray-600" strokeWidth="2" markerEnd="url(#arrowhead)" />
@@ -93,7 +105,7 @@ export const ArchitectureSection: React.FC = () => {
               </svg>
 
               {/* Nodes Grid Layout */}
-              <div className="grid grid-cols-2 gap-8 relative" style={{ zIndex: 1 }}>
+              <div className="grid grid-cols-2 gap-8 relative z-10">
                 {/* Top Row: Browser and CloudFront */}
                 <div className="col-span-1"></div>
                 <div className="col-span-1 flex justify-center">
@@ -172,16 +184,11 @@ interface NodeBoxProps {
 }
 
 const NodeBox: React.FC<NodeBoxProps> = ({ node }) => {
-  const colors = NODE_TYPE_COLORS[node.type];
+  const styles = NODE_TYPE_STYLES[node.type];
   
   return (
     <div 
-      className={`
-        bg-gradient-to-br ${colors.gradient}
-        border-2 ${colors.border}
-        rounded-lg p-4 min-w-[140px] text-center
-        shadow-lg hover:shadow-xl transition-shadow duration-200
-      `}
+      className={`${styles.containerClass} rounded-lg p-4 min-w-[140px] text-center shadow-lg hover:shadow-xl transition-shadow duration-200`}
     >
       <div className="text-white font-bold text-lg mb-1">
         {node.label}
@@ -202,11 +209,11 @@ interface LegendItemProps {
 }
 
 const LegendItem: React.FC<LegendItemProps> = ({ type, label }) => {
-  const colors = NODE_TYPE_COLORS[type];
+  const styles = NODE_TYPE_STYLES[type];
 
   return (
     <div className="flex items-center gap-2">
-      <div className={'w-4 h-4 rounded ' + colors.solid}></div>
+      <div className={styles.legendClass}></div>
       <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
     </div>
   );
