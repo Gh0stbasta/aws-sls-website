@@ -39,15 +39,16 @@ export const QuickStartSection: React.FC = () => {
         </div>
 
         {/* Timeline Steps */}
-        <div className="space-y-0">
+        <ol className="space-y-0 list-none">
           {quickStartStepsData.map((step, index) => (
-            <QuickStartStep 
-              key={step.id} 
-              step={step} 
-              isLast={index === quickStartStepsData.length - 1}
-            />
+            <li key={step.id}>
+              <QuickStartStep 
+                step={step} 
+                isLast={index === quickStartStepsData.length - 1}
+              />
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

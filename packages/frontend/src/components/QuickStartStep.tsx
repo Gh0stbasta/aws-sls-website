@@ -36,7 +36,10 @@ export const QuickStartStep: React.FC<QuickStartStepProps> = ({ step, isLast = f
       {/* Step Indicator Column */}
       <div className="flex flex-col items-center">
         {/* Circle with Number */}
-        <div className="w-12 h-12 rounded-full bg-primary-600 dark:bg-primary-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-lg">
+        <div 
+          className="w-12 h-12 rounded-full bg-primary-600 dark:bg-primary-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-lg"
+          aria-label={`Step ${step.number}`}
+        >
           {step.number}
         </div>
         
@@ -61,9 +64,11 @@ export const QuickStartStep: React.FC<QuickStartStepProps> = ({ step, isLast = f
         {/* Optional Command Block */}
         {step.command && (
           <div className="bg-gray-900 dark:bg-gray-950 rounded-lg p-4 overflow-x-auto">
-            <code className="text-sm sm:text-base text-green-400 dark:text-green-300 font-mono">
-              {step.command}
-            </code>
+            <pre>
+              <code className="text-sm sm:text-base text-green-400 dark:text-green-300 font-mono">
+                {step.command}
+              </code>
+            </pre>
           </div>
         )}
       </div>
