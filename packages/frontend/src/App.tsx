@@ -3,6 +3,7 @@ import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { HeroSection } from './sections/HeroSection'
 import { ArchitectureSection } from './sections/ArchitectureSection'
+import { FeaturesSection } from './sections/FeaturesSection'
 import { heroData } from './data/hero'
 
 function App() {
@@ -20,9 +21,7 @@ function App() {
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Quick Start Section</h2>
         </div>
 
-        <div id="features" className="min-h-screen flex items-center justify-center p-8">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Features Section</h2>
-        </div>
+        <FeaturesSection />
 
         <div id="about" className="min-h-screen flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-800">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">About Section</h2>
