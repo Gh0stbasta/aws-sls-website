@@ -4,6 +4,8 @@ AWS + React + Vite - Production Ready Template for Serverless Static Websites
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **📊 Projekt-Status:** [Quick Status](docs/QUICK-STATUS.md) | [Detaillierter Status](docs/PROJECT-STATUS.md) | **Fortschritt: ~30%** ✅
+
 ## 🌟 Features
 
 - **Serverless**: Hosted on AWS S3 + CloudFront (scales automatically)
