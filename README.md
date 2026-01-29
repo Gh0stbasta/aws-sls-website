@@ -6,6 +6,21 @@ AWS + React + Vite - Production Ready Template for Serverless Static Websites
 
 > **📊 Projekt-Status:** [Quick Status](docs/QUICK-STATUS.md) | [Detaillierter Status](docs/PROJECT-STATUS.md) | **Fortschritt: ~30%** ✅
 
+## Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Development Commands](#-development-commands)
+- [Deployment](#-deployment)
+- [Documentation](#-documentation)
+- [Security](#-security)
+- [Cost Estimation](#-cost-estimation)
+- [License](#-license)
+- [Contributing](#-contributing)
+- [FAQ](#-faq)
+
 ## 🌟 Features
 
 - **Serverless**: Hosted on AWS S3 + CloudFront (scales automatically)
@@ -152,10 +167,12 @@ aws cloudfront create-invalidation \
 
 ## 📚 Documentation
 
-- [Development Guide](docs/DEVELOPMENT.md) - Setup & local development
-- [Deployment Guide](docs/DEPLOYMENT.md) - How to deploy to AWS
-- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues & solutions
-- [Architecture Decisions](docs/adrs/) - Technical decisions (ADRs)
+- **[Development Guide](docs/DEVELOPMENT.md)** - Complete development environment setup and workflow
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Step-by-step deployment to AWS (manual and CI/CD)
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[FAQ](docs/FAQ.md)** - Frequently asked questions
+- **[Architecture Decisions](docs/adrs/)** - Technical decisions and rationale (ADRs)
+- **[Project Status](docs/PROJECT-STATUS.md)** - Detailed project status and progress
 
 ## 🔐 Security
 
@@ -211,68 +228,4 @@ Yes! Add API Gateway + Lambda functions. The template focuses on the frontend st
 ---
 
 **Built with ❤️ using TypeScript, React, and AWS**
-
-- **Modularität:** Code < 500 Zeilen pro File, lose Kopplung
-- **Architektur:** SOLID, Clean Architecture, Design Patterns
-- **Lesbarkeit:** Selbstdokumentierender Code, aussagekräftige Namen
-- **Performance:** Effiziente Algorithmen, Bottleneck-Dokumentation
-- **Fehlerbehandlung:** Explizit, keine Silent Failures
-
-### DevContainer & Versionskontrolle
-
-- **DevContainer:** Isolierte, reproduzierbare Entwicklungsumgebung (PFLICHT Phase 3)
-- **Git:** Conventional Commits, Working Branch Strategy, Checkpoints pro Ticket
-
-## 🚀 Schnelstart für neues Projekt
-
-1. **Kopiere diesen Ordner** als Basis für dein Projekt
-2. **Aktualisiere `agentContract.md`** – Passe Enterprise-Standards an dein Tech-Stack an
-3. **Phase 1 starten:** Discovery durchführen → `docs/discovery/requirements.md` füllen
-4. **ADRs erstellen:** Technische Entscheidungen dokumentieren → `docs/adrs/`
-5. **Phase 2:** Backlog planen, Tickets erstellen → `docs/planning/backlog.md`
-6. **Phase 3:** "Bearbeite TICKET-[ID]" → KI-Agent implementiert
-7. **Phase 4:** Code Review, Testing, Deployment
-
-## 📊 Ticket-Größen (für KI-Agents)
-
-| Größe | KI Effort | Human Effort | Best für |
-|-------|-----------|-------------|----------|
-| **XS** | ~10 min | ~1-2 h | Bug Fixes, kleine Configs |
-| **S** | ~30 min | ~3-4 h | Single Endpoint, Unit Tests |
-| **M** | ~1 h | ~4-8 h | Multi-Endpoint Features |
-| **L** | ~4 h | ~1-2 Tage | Komplexe Features → **AUFTEILEN!** |
-
-⚠️ **Hinweis:** XS-Tickets bevorzugen – höchste Erfolgsquote für KI-Agents.
-
-## ⚠️ Wichtige Grenzen & Hinweise
-
-### KI-Agent Realität
-- **Nicht autonom:** KI benötigt Steuerung und Feedback vom Architekten
-- **Junior Developer Mentalität:** Code muss vor Production validiert werden
-- **Business-Value Validierung:** Jedes Ticket muss auf echten Business-Value überprüft werden
-
-### Projektspezifische Anpassung
-- **Template, kein Standard:** Passe dieses Gerüst an dein Projekt und dein Team an
-- **Experimentieren:** Finde die beste Arbeitsweise für deinen Projekttyp
-- **Continuous Improvement:** Dokumentiere Learnings → zukünftige Tickets verbessern
-
-### Kalibrierung
-- Ticket-Größen sind **Startwerte**, nicht Absoluta
-- Starte mit 2-3 Tickets, miss tatsächliche Zeiten
-- Aktualisiere Tabelle basierend auf empirischen Daten
-- Retrospektiven dokumentieren (siehe Phase 4)
-
-## 📚 Weitere Ressourcen
-
-- **Agent Contract:** [workflow/agentContract.md](workflow/agentContract.md) – Zentrale Governance
-- **Phase 1 Details:** [workflow/01_discovery.md](workflow/01_discovery.md)
-- **Phase 2 Details:** [workflow/02_planning.md](workflow/02_planning.md)
-- **Phase 3 Details:** [workflow/03_implementation.md](workflow/03_implementation.md)
-- **Phase 4 Details:** [workflow/04_review.md](workflow/04_review.md)
-
----
-
-**Version:** 2.0  
-**Letzte Aktualisierung:** Januar 2026  
-**Status:** Production-Ready
 
