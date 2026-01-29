@@ -134,10 +134,9 @@ pnpm run test                  # Test all packages
 
 - AWS Account with OIDC Provider + Deployment Role configured
 - GitHub Secrets set (see [docs/GITHUB-SECRETS.md](docs/GITHUB-SECRETS.md)):
-  - `AWS_ROLE_ARN`
+  - `AWS_ACCOUNT_ID`
+  - `AWS_DEPLOY_ROLE_ARN`
   - `AWS_REGION`
-  - `WEBSITE_BUCKET`
-  - `CLOUDFRONT_DISTRIBUTION_ID`
 
 For detailed setup instructions, see [CI/CD Documentation](docs/CICD.md).
 

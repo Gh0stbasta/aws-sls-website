@@ -25,9 +25,10 @@ This document describes the automated CI/CD pipeline for deploying the serverles
 4. Install dependencies (`pnpm install`)
 5. Configure AWS credentials using OIDC
 6. Deploy infrastructure via CDK (if changes detected)
-7. Build frontend (`packages/frontend`)
-8. Sync frontend to S3 bucket
-9. Invalidate CloudFront cache
+7. Retrieve stack outputs (bucket name and distribution ID)
+8. Build frontend (`packages/frontend`)
+9. Sync frontend to S3 bucket (using retrieved bucket name)
+10. Invalidate CloudFront cache (using retrieved distribution ID)
 
 **Runtime:** ~5-10 minutes per deployment
 
@@ -37,10 +38,11 @@ The following secrets must be configured in your GitHub repository settings:
 
 | Secret Name | Description | Example Value |
 |------------|-------------|---------------|
-| `AWS_ROLE_ARN` | ARN of the GitHub Actions deployment role | `arn:aws:iam::123456789012:role/github-actions-deployment-role` |
+| `AWS_ACCOUNT_ID` | Your AWS account ID | `123456789012` |
+| `AWS_DEPLOY_ROLE_ARN` | ARN of the GitHub Actions deployment role | `arn:aws:iam::123456789012:role/github-actions-deployment-role` |
 | `AWS_REGION` | AWS region for deployment | `us-east-1` |
-| `WEBSITE_BUCKET` | S3 bucket name for website files | `aws-sls-website-prod` |
-| `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID | `E1234ABCDEFGH` |
+
+**Note:** The S3 bucket name and CloudFront distribution ID are automatically retrieved from the CDK stack outputs during deployment. You no longer need to configure them as secrets.
 
 ### Setting Secrets
 
@@ -178,9 +180,14 @@ Replace:
 - `YOUR_ACCOUNT_ID` with your AWS account ID
 - `YOUR_DISTRIBUTION_ID` with your CloudFront distribution ID
 
-### Step 5: Save Role ARN
+### Step 5: Save Role ARN and Account ID
 
-Copy the Role ARN (e.g., `arn:aws:iam::123456789012:role/github-actions-deployment-role`) and add it to GitHub Secrets as `AWS_ROLE_ARN`.
+1. Copy the Role ARN (e.g., `arn:aws:iam::123456789012:role/github-actions-deployment-role`)
+2. Note your AWS Account ID (e.g., `123456789012`)
+3. Add them to GitHub Secrets:
+   - `AWS_DEPLOY_ROLE_ARN`: The Role ARN
+   - `AWS_ACCOUNT_ID`: Your AWS account ID
+   - `AWS_REGION`: Your preferred AWS region
 
 ## Deployment Workflow
 
@@ -236,7 +243,7 @@ After deployment, access your website at:
 **Error:** `Error: Not authorized to perform sts:AssumeRoleWithWebIdentity`
 
 **Solution:**
-1. Verify `AWS_ROLE_ARN` secret is correct
+1. Verify `AWS_DEPLOY_ROLE_ARN` secret is correct
 2. Check OIDC provider is configured in AWS
 3. Verify trust relationship includes your repository
 4. Ensure workflow has `id-token: write` permission
@@ -246,18 +253,18 @@ After deployment, access your website at:
 **Error:** `An error occurred (AccessDenied) when calling the PutObject operation`
 
 **Solution:**
-1. Verify `WEBSITE_BUCKET` secret matches actual bucket name
-2. Check IAM role has `s3:PutObject` permission for the bucket
-3. Ensure bucket exists (deploy CDK stack first)
+1. Check IAM role has `s3:PutObject` permission for the bucket
+2. Ensure bucket exists (deploy CDK stack first)
+3. Verify stack outputs are correctly retrieved (check workflow logs for "Get Stack Outputs" step)
 
 ### Deployment Fails: CloudFront Invalidation Error
 
 **Error:** `An error occurred (InvalidArgument) when calling the CreateInvalidation operation`
 
 **Solution:**
-1. Verify `CLOUDFRONT_DISTRIBUTION_ID` secret is correct
-2. Check IAM role has `cloudfront:CreateInvalidation` permission
-3. Ensure distribution exists (deploy CDK stack first)
+1. Check IAM role has `cloudfront:CreateInvalidation` permission
+2. Ensure distribution exists (deploy CDK stack first)
+3. Verify stack outputs are correctly retrieved (check workflow logs for "Get Stack Outputs" step)
 
 ### Build Fails: pnpm Install Error
 
