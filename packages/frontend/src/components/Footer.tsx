@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('hero')}
-                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm cursor-pointer"
                 >
                   Home
                 </button>
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('features')}
-                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm cursor-pointer"
                 >
                   Features
                 </button>
@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('about')}
-                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm cursor-pointer"
                 >
                   About
                 </button>
@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('contact')}
-                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm cursor-pointer"
                 >
                   Contact
                 </button>

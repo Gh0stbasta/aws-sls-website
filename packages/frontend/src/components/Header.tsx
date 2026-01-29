@@ -28,25 +28,25 @@ export const Header: React.FC<HeaderProps> = ({ onThemeToggle }) => {
         <div className="hidden md:flex items-center gap-8">
           <button
             onClick={() => scrollToSection('hero')}
-            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
+            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
           >
             Home
           </button>
           <button
             onClick={() => scrollToSection('features')}
-            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
+            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
           >
             Features
           </button>
           <button
             onClick={() => scrollToSection('about')}
-            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
+            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
           >
             About
           </button>
           <button
             onClick={() => scrollToSection('contact')}
-            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
+            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
           >
             Contact
           </button>
