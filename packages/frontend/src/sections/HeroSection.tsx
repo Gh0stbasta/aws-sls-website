@@ -1,5 +1,7 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { scrollToSection } from '../utils/navigation';
+import { heroTitle, heroSubtitle, heroCTA } from '../animations/variants';
 
 /**
  * Hero Section Component Props
@@ -52,23 +54,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     >
       <div className="text-center px-4 max-w-4xl mx-auto">
         {/* Main Title - Large, responsive, with gradient */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent leading-tight">
+        <motion.h1 
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent leading-tight"
+          variants={heroTitle}
+          initial="hidden"
+          animate="visible"
+        >
           {title}
-        </h1>
+        </motion.h1>
         
         {/* Subtitle - Medium size, readable */}
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+        <motion.p 
+          className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto"
+          variants={heroSubtitle}
+          initial="hidden"
+          animate="visible"
+        >
           {subtitle}
-        </p>
+        </motion.p>
         
         {/* CTA Button - Styled with hover effects */}
-        <a
+        <motion.a
           href={ctaLink}
           onClick={handleCtaClick}
           className="inline-block bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-semibold text-lg px-8 py-4 rounded-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800"
+          variants={heroCTA}
+          initial="hidden"
+          animate="visible"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
         >
           {ctaText}
-        </a>
+        </motion.a>
       </div>
     </section>
   );
