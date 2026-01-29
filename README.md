@@ -220,7 +220,7 @@ Yes! This template is production-ready. It's used to host static websites, docum
 - Deploy with `git push origin main`
 
 ### How do I add a custom domain?
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md#custom-domain) for Route53 + ACM setup.
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md#custom-domain-setup) for Route53 + ACM setup.
 
 ### Can I add a backend API?
 Yes! Add API Gateway + Lambda functions. The template focuses on the frontend static hosting.
