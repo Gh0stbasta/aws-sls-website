@@ -1,0 +1,120 @@
+# =============================================================================
+# GitHub Actions Workflow: Deploy to AWS
+# =============================================================================
+# 
+# Purpose: Automated deployment of serverless static website to AWS
+# 
+# Trigger:
+#   - Push to main branch (automatic deployment)
+#   - Manual trigger via workflow_dispatch (for testing/hotfixes)
+# 
+# Security:
+#   - Uses AWS OIDC (OpenID Connect) for authentication (no long-lived credentials)
+#   - Requires GitHub Secrets: AWS_ROLE_ARN, AWS_REGION, WEBSITE_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
+#   - Secrets are automatically masked in logs
+# 
+# Related ADRs:
+#   - ADR-003: CI/CD Pipeline Strategy
+#   - ADR-004: Security & Deployment Credentials Strategy
+# 
+# =============================================================================
+
+name: Deploy to AWS
+
+on:
+  # Automatic deployment on push to main
+  push:
+    branches: [main]
+  
+  # Manual deployment trigger
+  workflow_dispatch:
+
+# OIDC permissions for AWS authentication
+# Required for temporary credential generation via GitHub OIDC provider
+permissions:
+  contents: read      # Read repository contents
+  id-token: write     # Generate OIDC token for AWS authentication
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      # =========================================================================
+      # Step 1: Checkout Repository
+      # =========================================================================
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # =========================================================================
+      # Step 2: Setup Node.js Environment
+      # =========================================================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      # =========================================================================
+      # Step 3: Install pnpm Package Manager
+      # =========================================================================
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      
+      # =========================================================================
+      # Step 4: Install Dependencies
+      # =========================================================================
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # =========================================================================
+      # Step 5: Configure AWS Credentials (OIDC)
+      # =========================================================================
+      # Uses OpenID Connect to obtain temporary AWS credentials
+      # No long-lived access keys stored in repository
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      # =========================================================================
+      # Step 6: Build Frontend
+      # =========================================================================
+      - name: Build Frontend
+        run: cd packages/frontend && pnpm run build
+      
+      # =========================================================================
+      # Step 7: Deploy Infrastructure (CDK)
+      # =========================================================================
+      # CDK automatically detects if infrastructure has changed
+      # Skips deployment if no changes detected
+      - name: Deploy Infrastructure (CDK)
+        run: cd packages/infrastructure && pnpm run cdk:deploy
+      
+      # =========================================================================
+      # Step 8: Deploy Frontend to S3
+      # =========================================================================
+      # Syncs frontend build artifacts to S3 bucket
+      # --delete: Remove files in S3 that don't exist locally (clean deployment)
+      # --quiet: Suppress verbose output (prevents secrets from appearing in logs)
+      - name: Deploy Frontend to S3
+        run: |
+          aws s3 sync packages/frontend/dist s3://${{ secrets.WEBSITE_BUCKET }} \
+            --delete \
+            --quiet
+      
+      # =========================================================================
+      # Step 9: Invalidate CloudFront Cache
+      # =========================================================================
+      # Creates cache invalidation to ensure users get latest content
+      # Output redirected to /dev/null to avoid logging distribution details
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            > /dev/null
