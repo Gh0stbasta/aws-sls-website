@@ -1,4 +1,5 @@
 import React from 'react';
+import { scrollToSection } from '../utils/navigation';
 
 /**
  * Hero Section Component Props
@@ -40,11 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     if (ctaLink.startsWith('#')) {
       e.preventDefault();
       const targetId = ctaLink.substring(1);
-      const targetElement = document.getElementById(targetId);
-      
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth' });
-      }
+      scrollToSection(targetId);
     }
   };
 

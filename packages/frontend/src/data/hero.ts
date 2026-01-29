@@ -5,14 +5,9 @@
  * Externalized for easy customization without touching component code.
  */
 
-export interface HeroData {
-  title: string;
-  subtitle: string;
-  ctaText: string;
-  ctaLink: string;
-}
+import type { HeroSectionProps } from '../sections/HeroSection';
 
-export const heroData: HeroData = {
+export const heroData: HeroSectionProps = {
   title: "Serverless Static Website Template",
   subtitle: "AWS + React + Vite - Production Ready",
   ctaText: "Get Started",

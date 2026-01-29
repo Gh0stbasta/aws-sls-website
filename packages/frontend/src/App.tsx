@@ -11,12 +11,7 @@ function App() {
     <>
       <Header onThemeToggle={toggleTheme} />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200">
-        <HeroSection 
-          title={heroData.title}
-          subtitle={heroData.subtitle}
-          ctaText={heroData.ctaText}
-          ctaLink={heroData.ctaLink}
-        />
+        <HeroSection {...heroData} />
 
         {/* Placeholder sections for navigation */}
         <div id="quick-start" className="min-h-screen flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-800">
