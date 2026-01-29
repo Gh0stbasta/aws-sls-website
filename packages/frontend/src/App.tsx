@@ -2,6 +2,7 @@ import { useTheme } from './contexts/ThemeContext'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { HeroSection } from './sections/HeroSection'
+import { CodeExamplesSection } from './sections/CodeExamplesSection'
 import { ArchitectureSection } from './sections/ArchitectureSection'
 import { heroData } from './data/hero'
 
@@ -19,6 +20,8 @@ function App() {
         <div id="quick-start" className="min-h-screen flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-800">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Quick Start Section</h2>
         </div>
+
+        <CodeExamplesSection />
 
         <div id="features" className="min-h-screen flex items-center justify-center p-8">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Features Section</h2>

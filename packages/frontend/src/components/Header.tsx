@@ -33,6 +33,12 @@ export const Header: React.FC<HeaderProps> = ({ onThemeToggle }) => {
             Home
           </button>
           <button
+            onClick={() => scrollToSection('code-examples')}
+            className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
+          >
+            Examples
+          </button>
+          <button
             onClick={() => scrollToSection('features')}
             className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium cursor-pointer"
           >
