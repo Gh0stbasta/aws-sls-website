@@ -285,18 +285,12 @@ Target: Green bars should be under 16.7ms (60fps)
 
 ### Respects `prefers-reduced-motion`
 
-All animation variants check the user's system preferences:
+Framer Motion automatically respects the user's system preferences for reduced motion. When `prefers-reduced-motion: reduce` is enabled in the user's system settings, Framer Motion will:
+- Instantly jump to the final state instead of animating
+- Disable all transform-based animations
+- Skip transition durations
 
-```tsx
-const prefersReducedMotion = (): boolean => {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
-```
-
-When enabled:
-- Animation durations become 0
-- Movement distances become 0
-- Elements still appear but without motion
+This behavior is built into Framer Motion and works automatically with all animation variants in this project.
 
 ### Testing Reduced Motion
 
@@ -306,12 +300,14 @@ When enabled:
 
 **Windows:**
 1. Settings → Ease of Access → Display
-2. Enable "Show animations in Windows"
+2. Turn off "Show animations in Windows"
 
 **Browser DevTools:**
 1. Chrome DevTools → Command Palette (Cmd/Ctrl + Shift + P)
 2. Type "emulate CSS prefers-reduced-motion"
-3. Select "reduced"
+3. Select "reduce"
+
+After enabling reduced motion, reload the page to see instant state changes instead of animations.
 
 ### Focus Management
 

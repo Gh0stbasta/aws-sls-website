@@ -4,18 +4,12 @@ import type { Variants } from 'framer-motion';
  * Animation Variants for Framer Motion
  * 
  * This module exports reusable animation variants for consistent animations
- * across the application. All animations respect the user's prefers-reduced-motion
- * setting for accessibility.
+ * across the application. Framer Motion automatically respects the user's 
+ * prefers-reduced-motion setting by reducing animation durations when enabled.
+ * 
+ * Note: When prefers-reduced-motion is enabled, Framer Motion automatically
+ * sets animation durations to 0, so we don't need to manually check the preference.
  */
-
-/**
- * Check if user prefers reduced motion
- * Returns true if the user has enabled reduced motion in their system preferences
- */
-const prefersReducedMotion = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
 
 /**
  * Fade In animation
@@ -28,7 +22,7 @@ export const fadeIn: Variants = {
   visible: { 
     opacity: 1,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut'
     }
   }
@@ -41,13 +35,13 @@ export const fadeIn: Variants = {
 export const fadeInUp: Variants = {
   hidden: { 
     opacity: 0, 
-    y: prefersReducedMotion() ? 0 : 20 
+    y: 20 
   },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut'
     }
   }
@@ -60,13 +54,13 @@ export const fadeInUp: Variants = {
 export const fadeInDown: Variants = {
   hidden: { 
     opacity: 0, 
-    y: prefersReducedMotion() ? 0 : -20 
+    y: -20 
   },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut'
     }
   }
@@ -84,9 +78,9 @@ export const staggerContainer: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: prefersReducedMotion() ? 0 : 0.1,
-      delayChildren: prefersReducedMotion() ? 0 : 0.2,
-      duration: prefersReducedMotion() ? 0 : 0.4
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+      duration: 0.4
     }
   }
 };
@@ -98,13 +92,13 @@ export const staggerContainer: Variants = {
 export const scaleIn: Variants = {
   hidden: { 
     opacity: 0, 
-    scale: prefersReducedMotion() ? 1 : 0.95 
+    scale: 0.95 
   },
   visible: { 
     opacity: 1, 
     scale: 1,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.5,
+      duration: 0.5,
       ease: 'easeOut'
     }
   }
@@ -117,13 +111,13 @@ export const scaleIn: Variants = {
 export const slideInLeft: Variants = {
   hidden: { 
     opacity: 0, 
-    x: prefersReducedMotion() ? 0 : -50 
+    x: -50 
   },
   visible: { 
     opacity: 1, 
     x: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut'
     }
   }
@@ -136,13 +130,13 @@ export const slideInLeft: Variants = {
 export const slideInRight: Variants = {
   hidden: { 
     opacity: 0, 
-    x: prefersReducedMotion() ? 0 : 50 
+    x: 50 
   },
   visible: { 
     opacity: 1, 
     x: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut'
     }
   }
@@ -155,15 +149,15 @@ export const slideInRight: Variants = {
 export const heroTitle: Variants = {
   hidden: { 
     opacity: 0, 
-    y: prefersReducedMotion() ? 0 : 30 
+    y: 30 
   },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.8,
+      duration: 0.8,
       ease: [0.6, 0.05, 0.01, 0.9],
-      delay: prefersReducedMotion() ? 0 : 0.2
+      delay: 0.2
     }
   }
 };
@@ -175,15 +169,15 @@ export const heroTitle: Variants = {
 export const heroSubtitle: Variants = {
   hidden: { 
     opacity: 0, 
-    y: prefersReducedMotion() ? 0 : 20 
+    y: 20 
   },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut',
-      delay: prefersReducedMotion() ? 0 : 0.4
+      delay: 0.4
     }
   }
 };
@@ -195,15 +189,15 @@ export const heroSubtitle: Variants = {
 export const heroCTA: Variants = {
   hidden: { 
     opacity: 0, 
-    y: prefersReducedMotion() ? 0 : 20 
+    y: 20 
   },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: prefersReducedMotion() ? 0 : 0.6,
+      duration: 0.6,
       ease: 'easeOut',
-      delay: prefersReducedMotion() ? 0 : 0.6
+      delay: 0.6
     }
   }
 };
