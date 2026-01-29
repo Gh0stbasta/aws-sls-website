@@ -22,7 +22,7 @@ export const codeExamplesData: CodeExample[] = [
 cd packages/infrastructure
 
 # Install dependencies
-npm install
+pnpm install
 
 # Deploy to AWS
 cdk deploy`,
