@@ -63,6 +63,7 @@ export const ArchitectureSection: React.FC = () => {
               <svg 
                 className="absolute top-0 left-0 w-full h-full pointer-events-none" 
                 style={{ zIndex: 0 }}
+                viewBox="0 0 100 100"
               >
                 {/* GitHub to Actions */}
                 <line x1="20%" y1="25%" x2="20%" y2="40%" className="stroke-gray-400 dark:stroke-gray-600" strokeWidth="2" markerEnd="url(#arrowhead)" />
