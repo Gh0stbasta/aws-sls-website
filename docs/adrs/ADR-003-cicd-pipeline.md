@@ -129,7 +129,7 @@ Trigger: Push to main
    ```yaml
    - name: Sync to S3
      run: |
-       aws s3 sync frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
+       aws s3 sync frontend/dist s3://${{ steps.stack-outputs.outputs.bucket-name }} --delete
    ```
 
 4. **CloudFront Invalidation:**
@@ -137,16 +137,17 @@ Trigger: Push to main
    - name: Invalidate CloudFront
      run: |
        aws cloudfront create-invalidation \
-         --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+         --distribution-id ${{ steps.stack-outputs.outputs.distribution-id }} \
          --paths "/*"
    ```
 
 ### Required GitHub Secrets
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `S3_BUCKET_NAME` (output from CDK)
-- `CLOUDFRONT_DISTRIBUTION_ID` (output from CDK)
+- `AWS_ACCOUNT_ID`
+- `AWS_DEPLOY_ROLE_ARN`
+- `AWS_REGION`
+
+**Note:** Bucket name and CloudFront distribution ID are retrieved automatically from CDK stack outputs.
 
 ### IAM Policy (Least Privilege)
 
