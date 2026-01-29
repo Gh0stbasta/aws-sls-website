@@ -1,6 +1,6 @@
 # 📊 Projekt Quick Status
 
-> **Wo stehen wir grade im Projekt?** Hier ist die Kurzübersicht.
+> **Wo stehen wir gerade im Projekt?** Hier ist die Kurzübersicht.
 
 ---
 
