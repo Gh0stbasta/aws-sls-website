@@ -30,7 +30,7 @@ export const ArchitectureSection: React.FC = () => {
   // Create a map for efficient node lookups
   const nodeMap = React.useMemo(() => {
     return new Map(architectureNodes.map(node => [node.id, node]));
-  }, []);
+  }, [architectureNodes]);
 
   // Helper to safely get nodes
   const getNode = (id: string) => nodeMap.get(id);
