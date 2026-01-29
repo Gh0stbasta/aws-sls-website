@@ -133,10 +133,13 @@ pnpm run test                  # Test all packages
 ### Prerequisites
 
 - AWS Account with OIDC Provider + Deployment Role configured
-- GitHub Secrets set:
-  - `AWS_ACCOUNT_ID`
-  - `AWS_REGION`
+- GitHub Secrets set (see [docs/GITHUB-SECRETS.md](docs/GITHUB-SECRETS.md)):
   - `AWS_ROLE_ARN`
+  - `AWS_REGION`
+  - `WEBSITE_BUCKET`
+  - `CLOUDFRONT_DISTRIBUTION_ID`
+
+For detailed setup instructions, see [CI/CD Documentation](docs/CICD.md).
 
 ### Automatic Deployment (Recommended)
 
@@ -167,12 +170,12 @@ aws cloudfront create-invalidation \
 
 ## 📚 Documentation
 
-- **[Development Guide](docs/DEVELOPMENT.md)** - Complete development environment setup and workflow
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Step-by-step deployment to AWS (manual and CI/CD)
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-- **[FAQ](docs/FAQ.md)** - Frequently asked questions
-- **[Architecture Decisions](docs/adrs/)** - Technical decisions and rationale (ADRs)
-- **[Project Status](docs/PROJECT-STATUS.md)** - Detailed project status and progress
+- [CI/CD Pipeline](docs/CICD.md) - GitHub Actions automated deployment
+- [GitHub Secrets Setup](docs/GITHUB-SECRETS.md) - Required secrets for CI/CD
+- [Development Guide](docs/DEVELOPMENT.md) - Setup & local development (if exists)
+- [Deployment Guide](docs/DEPLOYMENT.md) - How to deploy to AWS (if exists)
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues & solutions (if exists)
+- [Architecture Decisions](docs/adrs/) - Technical decisions (ADRs)
 
 ## 🔐 Security
 
